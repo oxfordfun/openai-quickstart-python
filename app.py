@@ -7,7 +7,7 @@ app = Flask(__name__)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-@app.route("/", methods=("GET", "POST"))
+@app.route("/pet", methods=("GET", "POST"))
 def index():
     if request.method == "POST":
         animal = request.form["animal"]
@@ -20,6 +20,21 @@ def index():
 
     result = request.args.get("result")
     return render_template("index.html", result=result)
+
+@app.route("/image", methods=("GET", "POST"))
+def image():
+    if request.method == "POST":
+        image_text = request.form["image_text"]
+        response = openai.Image.create(
+            prompt=image_text,
+            n=1,
+            size="1024x1024"
+        )
+        image = response['data'][0]['url']        
+        return redirect(url_for("image", result=image))
+
+    result = request.args.get("result")
+    return render_template("image.html", result=result)
 
 
 def generate_prompt(animal):
